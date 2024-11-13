@@ -1,9 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-
 export const visa = createApi({
   reducerPath: "visaAPI",
-  baseQuery: fetchBaseQuery({baseUrl: import.meta.env.VITE_SERVER_BASE_URL}),
+  baseQuery: fetchBaseQuery({ baseUrl: import.meta.env.VITE_SERVER_BASE_URL }),
 
   endpoints: (builder) => ({
     createVisa: builder.mutation({
@@ -17,7 +16,19 @@ export const visa = createApi({
     }),
 
     getAllVisa: builder.query({
-      query: ({page, limit}) => `/visa?page=${page}&limit=${limit}`,
+      query: (args) => {
+        const params = new URLSearchParams();
+        if (args) {
+          args.forEach((item) => {
+            params.append(item.name, item.value);
+          });
+        }
+        return {
+          url: "/visa",
+          method: "GET",
+          params,
+        };
+      },
     }),
 
     getSingleVisa: builder.query({
@@ -42,10 +53,8 @@ export const visa = createApi({
         };
       },
     }),
-
   }),
 });
-
 
 export const {
   useGetAllVisaQuery,
@@ -53,6 +62,5 @@ export const {
   useLazyGetSingleVisaQuery,
   useCreateVisaMutation,
   useUpdateVisaMutation,
-  useDeleteVisaMutation
-
+  useDeleteVisaMutation,
 } = visa;

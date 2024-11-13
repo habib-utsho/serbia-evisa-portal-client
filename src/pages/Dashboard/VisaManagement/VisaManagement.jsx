@@ -20,11 +20,27 @@ import {
   useUpdateVisaMutation,
 } from "../../../redux/api/visa/visaApi";
 import { BsEye } from "react-icons/bs";
+import useDebounce from "../../../hooks/useDebounce";
 
 const VisaManagement = () => {
   const [pagination, setPagination] = useState({ page: 1, limit: 10 });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const debounceSearch = useDebounce(searchTerm, 500);
 
-  const { data: visaData, refetch, isLoading } = useGetAllVisaQuery(pagination);
+  const {
+    data: visaData,
+    refetch,
+    isLoading,
+    isFetching,
+  } = useGetAllVisaQuery([
+    { name: "page", value: pagination.page },
+    { name: "limit", value: pagination.limit },
+    ...(debounceSearch ? [{ name: "searchTerm", value: debounceSearch }] : []),
+    ...(selectedCategory !== "All"
+      ? [{ name: "category", value: selectedCategory }]
+      : []),
+  ]);
   const [deleteVisa, { isLoading: deleteVisaIsLoading }] =
     useDeleteVisaMutation();
   const [createVisa, { isLoading: createVisaIsLoading }] =
@@ -315,7 +331,7 @@ const VisaManagement = () => {
   // console.log(isLoading, visaData, 'VisaData');
 
   return (
-    <div>
+    <div className="px-4 md:px-6">
       <div className="my-container space-y-12 md:space-y-16">
         <div className="flex justify-end mr-5 my-5">
           {isLoading ? (
@@ -334,27 +350,55 @@ const VisaManagement = () => {
             </Button>
           )}
         </div>
-        {isLoading ? (
-          <div>
-            <Skeleton active />
-            <Skeleton active />
-            <Skeleton active />
-            <Skeleton active />
+
+        <div>
+          {/* Searching area */}
+          <div className="flex gap-4 justify-between mb-8 flex-wrap">
+            <div className="flex items-center gap-2">
+              <Input.Search
+                placeholder="Search name, visa Id or Passport number"
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setPagination({ page: 1, limit: 10 });
+                }}
+                size="middle"
+                allowClear
+                enterButton
+                className="w-[300px] lg:w-[350px] "
+              />
+              <Select
+                value={selectedCategory}
+                className="w-[170px]"
+                onChange={(value) => {
+                  setSelectedCategory(value);
+                  setPagination({ page: 1, limit: 10 });
+                }}
+                options={[
+                  "All",
+                  "РАД / WORK",
+                  "ТУРИСТ / TOURIST",
+                  "БИЗНИС / BUSINESS",
+                ].map((elem) => ({ label: elem, value: elem }))}
+              />
+            </div>
           </div>
-        ) : (
           <Table
             dataSource={visaData?.data}
             columns={columns}
             rowKey="_id"
+            loading={isLoading || isFetching}
             scroll={{ x: 800 }}
             pagination={{
               total: visaData?.meta?.total,
+              current: pagination.page,
+              pageSize: pagination.limit,
               onChange: (page, pageSize) => {
-                setPagination({ page, pageSize });
+                setPagination({ page, limit: pageSize });
               },
             }}
           />
-        )}
+        </div>
+
         {/* Update modal */}
         <Modal
           title={editingVisa ? "Update Visa" : "Add Visa"}

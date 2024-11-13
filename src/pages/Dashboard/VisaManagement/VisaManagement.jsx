@@ -167,6 +167,7 @@ const VisaManagement = () => {
       title: "Category",
       dataIndex: "category",
       key: "category",
+      render: (text, record) => <p>{record.category || "РАД / WORK"}</p>,
     },
     {
       title: "Action",

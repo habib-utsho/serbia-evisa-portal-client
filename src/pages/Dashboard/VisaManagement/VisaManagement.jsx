@@ -50,6 +50,7 @@ const VisaManagement = () => {
         name: editingVisa.name,
         dob: editingVisa.dob,
         sex: editingVisa.sex,
+        category: editingVisa.category,
         travelDocumentNumber: editingVisa.travelDocumentNumber,
         validityStart: editingVisa.validityStart,
         validityEnd: editingVisa.validityEnd,
@@ -161,6 +162,11 @@ const VisaManagement = () => {
       title: "Surname",
       dataIndex: "surName",
       key: "surname",
+    },
+    {
+      title: "Category",
+      dataIndex: "category",
+      key: "category",
     },
     {
       title: "Action",

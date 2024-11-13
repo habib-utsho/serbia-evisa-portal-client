@@ -251,7 +251,7 @@ const VisaManagement = () => {
       label: "Category",
       placeholder: "Select category",
       type: "select",
-      options: ["РАД / WORK", "Тоурист/ Tourist", "Бизнис / Business"].map(
+      options: ["РАД / WORK", "ТУРИСТ / TOURIST", "БИЗНИС / BUSINESS"].map(
         (elem) => ({ value: elem, label: elem })
       ),
     },
